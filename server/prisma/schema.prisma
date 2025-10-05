@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Planet {
+  id            String   @id @default(cuid())
+  pl_name       String   @unique
+  hostname      String
+  sy_dist       Float?   // Distance in parsecs
+  pl_rade       Float?   // Planet radius (Earth radii)
+  pl_bmasse     Float?   // Planet mass (Earth masses)
+  pl_orbper     Float?   // Orbital period (days)
+  pl_insol      Float?   // Insolation flux (Earth flux)
+  pl_eqt        Float?   // Equilibrium temperature (K)
+  discoverymethod String
+  discoveryyear Int
+  st_spectype   String?  // Stellar spectral type
+  st_teff       Float?   // Stellar effective temperature (K)
+  image         String?  // Image URL
+  special       String?  // Special characteristics
+  classification String? // Planet classification
+  summary       String?  // Planet summary
+  
+  // Additional metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  chatMentions  ChatMessage[]
+  userFavorites UserFavoritePlanet[]
+  
+  @@map("planets")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  name      String?
+  email     String?
+  
+  // Preferences
+  preferredUnits String @default("metric") // metric, imperial
+  interests     String @default("") // comma-separated: habitable,hot,cold,gas-giants,etc
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  lastActive DateTime @default(now())
+  
+  // Relations
+  chatSessions ChatSession[]
+  favorites    UserFavoritePlanet[]
+  
+  @@map("users")
+}
+
+model ChatSession {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String?
+  isActive  Boolean  @default(true)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+  
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  content   String
+  sender    String   // 'user' or 'assistant'
+  messageType String @default("text") // text, planet_info, comparison, recommendation
+  
+  // Optional planet reference
+  planetId  String?
+  
+  // Message metadata
+  metadata  String?  // JSON string for additional data
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  
+  // Relations
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  planet  Planet?     @relation(fields: [planetId], references: [id])
+  
+  @@map("chat_messages")
+}
+
+model UserFavoritePlanet {
+  id       String @id @default(cuid())
+  userId   String
+  planetId String
+  notes    String?
+  
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planet Planet @relation(fields: [planetId], references: [id], onDelete: Cascade)
+  
+  // Prevent duplicate favorites
+  @@unique([userId, planetId])
+  @@map("user_favorite_planets")
+}
+
+model SystemInfo {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  
+  updatedAt DateTime @updatedAt
+  
+  @@map("system_info")
+}

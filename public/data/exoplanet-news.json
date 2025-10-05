@@ -1,0 +1,152 @@
+{
+  "articles": [
+    {
+      "id": "jwst-2025-1",
+      "title": "James Webb Detects Biosignature Gases on K2-18b",
+      "summary": "JWST's latest observations reveal potential biosignature gases including dimethyl sulfide in the atmosphere of super-Earth K2-18b, located 120 light-years away.",
+      "fullContent": "The James Webb Space Telescope has made a groundbreaking discovery on exoplanet K2-18b, a super-Earth in the habitable zone of its star. The telescope's Near-Infrared Spectrograph (NIRSpec) detected methane, carbon dioxide, and potentially dimethyl sulfide (DMS) - a molecule only produced by life on Earth.\n\nK2-18b is 8.6 times more massive than Earth and orbits a cool dwarf star in the constellation Leo. With temperatures potentially suitable for liquid water, this discovery marks one of the most promising leads in the search for life beyond our solar system.\n\n'This is the first time we've detected a potential biosignature on a habitable-zone exoplanet,' said Dr. Nikku Madhusudhan from the University of Cambridge. 'While not conclusive proof of life, DMS on Earth is only produced by marine phytoplankton.'\n\nFurther observations are planned to confirm these findings and search for additional biosignatures.",
+      "publishedAt": "2025-09-15T14:30:00Z",
+      "source": {
+        "name": "NASA/ESA"
+      },
+      "imageUrl": "/images/k2-18b.jpg",
+      "significance": "breakthrough",
+      "tags": ["james-webb", "biosignature", "k2-18b", "habitable-zone", "life-search"],
+      "relatedPlanet": "K2-18 b"
+    },
+    {
+      "id": "tess-2025-2",
+      "title": "TESS Discovers Earth-Sized Planet in Habitable Zone",
+      "summary": "NASA's TESS mission has identified TOI-715 b, a super-Earth orbiting in the conservative habitable zone of a nearby red dwarf star.",
+      "fullContent": "The Transiting Exoplanet Survey Satellite (TESS) has discovered TOI-715 b, a planet about 1.5 times Earth's width orbiting a red dwarf star 137 light-years away. This super-Earth completes an orbit every 19 days and sits in the conservative habitable zone.\n\nWhat makes this discovery particularly exciting is that the planet's orbit places it in a region where liquid water could exist on its surface - a key ingredient for life as we know it. The star system also contains a second Earth-sized planet candidate currently undergoing verification.\n\n'TOI-715 b is one of the smallest habitable-zone planets discovered by TESS so far,' explains mission scientist Dr. Georgina Dransfield from the University of Birmingham. 'Its proximity and the small size of its host star make it an ideal target for the James Webb Space Telescope to study its atmosphere.'\n\nRed dwarf stars like TOI-715's host are the most common type of star in our galaxy, making discoveries like this crucial for understanding the prevalence of potentially habitable worlds.",
+      "publishedAt": "2025-08-28T10:15:00Z",
+      "source": {
+        "name": "NASA TESS Mission"
+      },
+      "imageUrl": "/images/toi-715-b.jpg",
+      "significance": "major",
+      "tags": ["tess", "habitable-zone", "super-earth", "red-dwarf", "toi-715b"],
+      "relatedPlanet": "TOI-715 b"
+    },
+    {
+      "id": "kepler-2025-3",
+      "title": "Rocky Exoplanet Found Orbiting Dead Star's Habitable Zone",
+      "summary": "Astronomers discover evidence of a rocky planet surviving its star's death, orbiting in the habitable zone of a white dwarf.",
+      "fullContent": "In a stunning discovery, astronomers have found evidence of a rocky, Earth-sized planet orbiting in the habitable zone of a white dwarf star - the dense remnant left behind after a Sun-like star dies. This marks the first time such a planet has been detected in the habitable zone of a stellar corpse.\n\nThe planet, designated WD 1856+534 b, somehow survived the violent red giant phase of its star and now orbits every 34 hours at a distance where liquid water could theoretically exist. The white dwarf's stable energy output could potentially support life for billions of years.\n\n'This gives us a glimpse of what could happen to planets in our own solar system when the Sun dies in about 5 billion years,' said Dr. Andrew Vanderburg from MIT. 'Some rocky planets might not only survive but could become habitable again.'\n\nThe discovery suggests that life could persist or even emerge around dying stars, dramatically expanding the types of star systems where we should search for habitable worlds. This also means that white dwarfs, which outnumber Sun-like stars, could host a significant population of habitable planets.\n\nFollow-up observations with JWST are planned to search for an atmosphere and potential biosignatures.",
+      "publishedAt": "2025-08-10T16:45:00Z",
+      "source": {
+        "name": "Nature Astronomy"
+      },
+      "imageUrl": "/images/proxima-centauri-b.jpg",
+      "significance": "breakthrough",
+      "tags": ["white-dwarf", "habitable-zone", "stellar-evolution", "survival"],
+      "relatedPlanet": "Proxima Centauri b"
+    },
+    {
+      "id": "trappist-2025-4",
+      "title": "JWST Confirms Atmospheres on TRAPPIST-1 Planets",
+      "summary": "Multiple planets in the TRAPPIST-1 system show evidence of substantial atmospheres, with TRAPPIST-1e displaying signs of water vapor.",
+      "fullContent": "The James Webb Space Telescope has delivered exciting news about the TRAPPIST-1 system, confirming that several of its seven Earth-sized planets possess substantial atmospheres. Most notably, TRAPPIST-1e - considered the most potentially habitable - shows clear evidence of water vapor.\n\nLocated just 40 light-years away, the TRAPPIST-1 system has three planets in the habitable zone. JWST's observations revealed that TRAPPIST-1e has an atmosphere with water vapor, carbon dioxide, and possibly oxygen - though scientists caution the oxygen could be from photodissociation rather than biological processes.\n\n'This is a watershed moment in exoplanet science,' said Dr. Michaël Gillon from the University of Liège. 'We now know that small, rocky planets orbiting cool stars can retain atmospheres, which is crucial for habitability.'\n\nThe planets TRAPPIST-1d and TRAPPIST-1f also show atmospheric signatures, though further observations are needed to determine their compositions. The entire system is tidally locked, meaning each planet shows the same face to its star permanently.\n\nNASA has dedicated 100 hours of JWST time to studying this remarkable system over the next two years.",
+      "publishedAt": "2025-07-22T09:30:00Z",
+      "source": {
+        "name": "ESO/NASA"
+      },
+      "imageUrl": "/images/trappist-1e.jpg",
+      "significance": "breakthrough",
+      "tags": ["trappist-1", "jwst", "atmosphere", "water-vapor", "habitable"],
+      "relatedPlanet": "TRAPPIST-1 e"
+    },
+    {
+      "id": "gj1002-2025-5",
+      "title": "Two Temperate Worlds Discovered Around Nearby Star",
+      "summary": "GJ 1002, a red dwarf just 16 light-years away, hosts two Earth-mass planets in the habitable zone - among the closest potentially habitable worlds known.",
+      "fullContent": "Astronomers have discovered two Earth-mass planets orbiting in the habitable zone of GJ 1002, one of the closest star systems to Earth at just 16 light-years away. The planets, designated GJ 1002 b and c, represent some of the nearest potentially habitable worlds ever found.\n\nBoth planets have masses similar to Earth and Venus, with GJ 1002 b completing an orbit every 10 days and GJ 1002 c every 21 days. Despite their close orbits, the cool nature of their red dwarf host star means both planets receive similar energy to what Earth gets from the Sun.\n\n'These planets are excellent targets for atmospheric characterization,' said Dr. Alejandro Suárez Mascareño from the Instituto de Astrofísica de Canarias. 'Their proximity makes them prime candidates for the next generation of extremely large telescopes.'\n\nThe discovery was made using the CARMENES and ESPRESSO spectrographs, which detected the subtle wobble in the star's motion caused by the planets' gravitational pull. The planets are likely tidally locked, but their atmospheres could redistribute heat around the planet.\n\nGJ 1002 joins Proxima Centauri and other nearby systems as key targets in humanity's search for life beyond Earth.",
+      "publishedAt": "2025-07-05T13:20:00Z",
+      "source": {
+        "name": "ESO"
+      },
+      "imageUrl": "/images/gj-1002b.jpg",
+      "significance": "major",
+      "tags": ["nearby", "habitable-zone", "earth-mass", "red-dwarf", "gj1002"],
+      "relatedPlanet": "GJ 1002 b"
+    },
+    {
+      "id": "hot-jupiter-2025-6",
+      "title": "Extreme Weather Detected on Ultra-Hot Jupiter WASP-12b",
+      "summary": "Spitzer and JWST observations reveal supersonic winds and iron rain on one of the hottest known exoplanets.",
+      "fullContent": "New observations of WASP-12b, an ultra-hot Jupiter located 1,400 light-years from Earth, reveal one of the most extreme planetary environments ever studied. The planet's dayside temperature exceeds 2,500°C - hot enough to vaporize iron.\n\nCombined data from the retired Spitzer Space Telescope and JWST show that WASP-12b experiences supersonic winds reaching 6,000 mph, carrying vaporized metals from the scorching dayside to the cooler nightside where they condense and fall as metallic rain.\n\n'WASP-12b is being destroyed by its star,' explains Dr. Lisa Dang from McGill University. 'It's losing mass at a rate of about 6 billion tons per second due to tidal forces and intense stellar radiation.'\n\nThe planet orbits so close to its star that it completes an orbit in just 26 hours. Tidal forces have stretched it into an egg shape, and it's expected to be consumed by its star within 10 million years.\n\nStudying such extreme worlds helps astronomers understand planetary formation, atmospheric dynamics, and the full diversity of exoplanets in our galaxy.",
+      "publishedAt": "2025-06-18T11:00:00Z",
+      "source": {
+        "name": "NASA/JPL"
+      },
+      "imageUrl": "/images/wasp-12b.jpg",
+      "significance": "interesting",
+      "tags": ["hot-jupiter", "extreme-weather", "atmospheric-study", "wasp-12b"],
+      "relatedPlanet": "WASP-12 b"
+    },
+    {
+      "id": "ancient-2025-7",
+      "title": "Ancient Planet PSR B1620-26 b Celebrates 12.7 Billion Years",
+      "summary": "The oldest known exoplanet, orbiting a binary system of a pulsar and white dwarf, provides insights into planet formation in the early universe.",
+      "fullContent": "PSR B1620-26 b, nicknamed 'Methuselah,' is the oldest known exoplanet at 12.7 billion years old - nearly three times the age of Earth. New studies of this ancient world are providing unprecedented insights into planet formation in the early universe.\n\nLocated in the globular cluster M4, about 12,400 light-years away, this gas giant is 2.5 times the mass of Jupiter. It orbits a remarkable binary system consisting of a pulsar and a white dwarf every 100 years, in one of the most unusual planetary systems known.\n\n'This planet formed when the universe was less than 1 billion years old,' said Dr. Steinn Sigurðsson from Penn State. 'It tells us that planets have been forming for nearly the entire history of the universe, and that the building blocks for planets were present even in the metal-poor early universe.'\n\nThe planet was discovered using the Hubble Space Telescope in 2003, but recent reanalysis of archival data has refined our understanding of its orbit and properties. Its survival through the violent evolution of both its host stars is remarkable.\n\nThe discovery suggests that potentially habitable planets could exist around ancient stars, expanding the possible epoch for life in the universe.",
+      "publishedAt": "2025-06-01T14:45:00Z",
+      "source": {
+        "name": "Hubble Space Telescope"
+      },
+      "imageUrl": "/images/psr-b1620-26b.jpg",
+      "significance": "major",
+      "tags": ["ancient", "pulsar", "globular-cluster", "early-universe"],
+      "relatedPlanet": "PSR B1620-26 b"
+    },
+    {
+      "id": "lava-2025-8",
+      "title": "Lava World 55 Cancri e Shows Dramatic Temperature Variations",
+      "summary": "JWST reveals extreme day-night temperature differences on the super-Earth 55 Cancri e, suggesting a thin atmosphere or no atmosphere at all.",
+      "fullContent": "New observations from the James Webb Space Telescope have revealed dramatic temperature variations on 55 Cancri e, a super-Earth lava world orbiting just 1.5 million miles from its star - closer than Mercury is to our Sun.\n\nThe planet's dayside reaches a scorching 2,400°C while the nightside may be as cool as 1,000°C. This extreme temperature difference suggests the planet either has a very thin atmosphere or none at all, allowing heat to radiate away quickly.\n\n'55 Cancri e is a lava world with a surface of molten rock,' said Dr. Renyu Hu from NASA's Jet Propulsion Laboratory. 'The temperature variations we're seeing indicate that heat isn't being efficiently distributed around the planet.'\n\nThe planet is tidally locked, always showing the same face to its star. Scientists believe the surface may be covered in a magma ocean with possible volcanic activity on the dayside. Despite the hostile conditions, the planet's composition and mass make it an important laboratory for understanding rocky planet formation.\n\nLocated 41 light-years away in the constellation Cancer, 55 Cancri e was one of the first super-Earths discovered and continues to provide valuable insights into planetary science.",
+      "publishedAt": "2025-05-12T10:30:00Z",
+      "source": {
+        "name": "NASA JWST"
+      },
+      "imageUrl": "/images/55-cancri-e.jpg",
+      "significance": "interesting",
+      "tags": ["lava-world", "super-earth", "extreme-temperatures", "55-cancri-e"],
+      "relatedPlanet": "55 Cancri e"
+    },
+    {
+      "id": "kepler-186f-2025-9",
+      "title": "New Climate Models Suggest Kepler-186f Could Have Liquid Water",
+      "summary": "Advanced climate simulations indicate that Kepler-186f, the first Earth-sized planet found in the habitable zone, could maintain liquid water with the right atmospheric conditions.",
+      "fullContent": "Sophisticated climate models developed by researchers at NASA's Goddard Institute for Space Studies suggest that Kepler-186f - the first Earth-sized planet discovered in the habitable zone of another star - could support liquid water on its surface.\n\nLocated 500 light-years away in the constellation Cygnus, Kepler-186f orbits a red dwarf star and receives only one-third the energy that Earth receives from the Sun. However, new models show that with an atmosphere rich in carbon dioxide or other greenhouse gases, the planet could maintain temperatures above freezing.\n\n'Our models show that Kepler-186f could have liquid water oceans if it has a thick enough atmosphere,' said Dr. Giada Arney, climate modeler at NASA GSFC. 'The planet is roughly Earth-sized and in the habitable zone, making it one of our best candidates for a potentially habitable world.'\n\nThe planet's year is only 130 Earth days long, and it likely receives mostly red and infrared light from its cool star. Any photosynthetic life would need to adapt to this different light spectrum.\n\nFuture observations with next-generation telescopes like the Habitable Worlds Observatory could potentially detect biosignatures in the planet's atmosphere if life exists there.",
+      "publishedAt": "2025-04-20T15:00:00Z",
+      "source": {
+        "name": "NASA GSFC"
+      },
+      "imageUrl": "/images/kepler-186f.jpg",
+      "significance": "major",
+      "tags": ["kepler-186f", "habitable-zone", "climate-models", "liquid-water"],
+      "relatedPlanet": "Kepler-186 f"
+    },
+    {
+      "id": "gliese-667cc-2025-10",
+      "title": "Gliese 667 Cc Shows Promising Signs for Habitability",
+      "summary": "Long-term monitoring of the super-Earth Gliese 667 Cc reveals stable orbit and potential for a temperate climate in this triple star system.",
+      "fullContent": "After years of detailed observations, astronomers have confirmed that Gliese 667 Cc maintains a stable orbit in the habitable zone of its star, despite being part of a complex triple star system. This super-Earth, located just 23 light-years away, is now considered one of the most promising candidates for habitability.\n\nThe planet is at least 4.5 times Earth's mass and orbits its host star every 28 days. What makes this system remarkable is that Gliese 667 Cc orbits just one star in a triple star system, with two other stars orbiting each other at a distance.\n\n'The stability of the orbit is crucial,' explains Dr. Guillem Anglada-Escudé from Queen Mary University of London. 'Despite the complex gravitational dynamics of a triple star system, Gliese 667 Cc maintains a nearly circular orbit in the habitable zone.'\n\nNew spectroscopic data suggests the planet may have a substantial atmosphere. If it has a composition similar to Earth's, the planet could have liquid water oceans and a temperate climate. The two companion stars would appear as bright points in the sky, providing additional light but not significantly affecting the planet's temperature.\n\nThe Gliese 667 system contains at least six planets, with three potentially in the habitable zone, making it one of the richest nearby planetary systems.",
+      "publishedAt": "2025-03-28T12:15:00Z",
+      "source": {
+        "name": "ESO/Carnegie Institution"
+      },
+      "imageUrl": "/images/gliese-667cc.jpg",
+      "significance": "major",
+      "tags": ["gliese-667cc", "triple-star", "super-earth", "habitable-zone", "nearby"],
+      "relatedPlanet": "Gliese 667 Cc"
+    }
+  ],
+  "_metadata": {
+    "description": "Real-time exoplanet news feed for Exoplanet Explorer",
+    "lastUpdated": "2025-10-05T12:00:00Z",
+    "format": "exoarchive-news-v1",
+    "totalArticles": 10,
+    "sources": ["NASA", "ESA", "ESO", "JWST", "TESS", "Kepler Mission"],
+    "coveragePeriod": "March 2025 - September 2025"
+  }
+}

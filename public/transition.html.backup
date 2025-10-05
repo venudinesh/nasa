@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exoplanet Explorer Journey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .speed-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .speed-lines.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <canvas id="speedCanvas" class="speed-lines"></canvas>
+    <div class="stars" id="stars"></div>
+
+    <script>
+        const params = new URLSearchParams(location.search);
+        const planetName = params.get('planet') || '';
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const speedCanvas = document.getElementById('speedCanvas');
+        const speedCtx = speedCanvas.getContext('2d');
+        
+        let width, height;
+        let animationId;
+        let transitionProgress = 0;
+        let isTransitioning = true;
+        let astronaut = { x: 0, y: 0, rotation: 0, scale: 1 };
+        let rocket = { x: 0, y: 0, rotation: 0, scale: 1, thrustIntensity: 0 };
+        let camera = { x: 0, y: 0, zoom: 1, shake: 0 };
+        let particles = [];
+        let speedLines = [];
+
+        const planetColors = {
+            'Kepler-186f': { color: '#2d5a3d', atmosphere: '#4a7c59', size: 75 },
+            'Proxima Centauri b': { color: '#c44e3a', atmosphere: '#d67059', size: 72 },
+            'TRAPPIST-1e': { color: '#5a7ba6', atmosphere: '#7a9bc6', size: 78 },
+            'TOI-715b': { color: '#8b6f47', atmosphere: '#a68962', size: 82 },
+            'HD 40307g': { color: '#4a7c9c', atmosphere: '#6a9cbc', size: 88 },
+            '55 Cancri e': { color: '#d94a2e', atmosphere: '#f96a4e', size: 77 },
+            'WASP-12b': { color: '#1a1a2e', atmosphere: '#3a2a4e', size: 95, rings: true },
+            'Gliese 667Cc': { color: '#a67c52', atmosphere: '#c69c72', size: 80 },
+            'K2-18b': { color: '#4a6fa5', atmosphere: '#6a8fc5', size: 85 },
+            'GJ 1002b': { color: '#7a5a4a', atmosphere: '#9a7a6a', size: 73 },
+            'KELT-9b': { color: '#2a3a7a', atmosphere: '#4a5a9a', size: 92 },
+            'PSR B1620-26b': { color: '#8a7a9a', atmosphere: '#aa9aba', size: 70, rings: true }
+        };
+
+        const planet = planetColors[planetName] || { color: '#4a7c9c', atmosphere: '#6a9cbc', size: 80 };
+
+        function resize() {
+            width = canvas.width = speedCanvas.width = window.innerWidth;
+            height = canvas.height = speedCanvas.height = window.innerHeight;
+            astronaut.x = width * 0.25;
+            astronaut.y = height / 2;
+        }
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 300; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2.5 + 0.5;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function drawAstronaut(x, y, rotation, scale = 1) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.scale(scale, scale);
+
+            const helmetGlow = ctx.createRadialGradient(0, -15, 0, 0, -15, 30);
+            helmetGlow.addColorStop(0, 'rgba(232, 244, 248, 0.3)');
+            helmetGlow.addColorStop(1, 'rgba(232, 244, 248, 0)');
+            ctx.fillStyle = helmetGlow;
+            ctx.beginPath();
+            ctx.arc(0, -15, 30, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#e8f4f8';
+            ctx.beginPath();
+            ctx.arc(0, -15, 22, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.beginPath();
+            ctx.arc(-8, -20, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            const visorGradient = ctx.createLinearGradient(0, -25, 0, -5);
+            visorGradient.addColorStop(0, '#4a90e2');
+            visorGradient.addColorStop(1, '#64b5f6');
+            ctx.fillStyle = visorGradient;
+            ctx.beginPath();
+            ctx.arc(0, -15, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.beginPath();
+            ctx.arc(-5, -18, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(-18, 5, 36, 40);
+            
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(-18, 15, 36, 4);
+            ctx.fillRect(-18, 30, 36, 4);
+
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(-30, 10, 12, 30);
+            ctx.fillRect(18, 10, 12, 30);
+            
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(-24, 42, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(24, 42, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(-14, 45, 12, 25);
+            ctx.fillRect(2, 45, 12, 25);
+
+            ctx.fillStyle = '#34495e';
+            ctx.fillRect(-16, 68, 14, 8);
+            ctx.fillRect(2, 68, 14, 8);
+
+            ctx.fillStyle = '#d0d0d0';
+            ctx.fillRect(-14, 8, 28, 32);
+            
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(-10, 12, 20, 3);
+            ctx.fillRect(-10, 28, 20, 3);
+
+            ctx.restore();
+        }
+
+        function drawRocket(x, y, rotation, scale = 1) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.scale(scale, scale);
+
+            if (rocket.thrustIntensity > 0) {
+                const flameHeight = 30 + Math.random() * 15;
+                const intensity = rocket.thrustIntensity;
+                
+                ctx.fillStyle = `rgba(243, 156, 18, ${0.8 * intensity})`;
+                ctx.beginPath();
+                ctx.moveTo(-18, 35);
+                ctx.lineTo(-12, 35 + flameHeight);
+                ctx.lineTo(-6, 35);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(18, 35);
+                ctx.lineTo(12, 35 + flameHeight);
+                ctx.lineTo(6, 35);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(-10, 35);
+                ctx.lineTo(0, 35 + flameHeight * 1.3);
+                ctx.lineTo(10, 35);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.fillStyle = `rgba(231, 76, 60, ${0.9 * intensity})`;
+                ctx.beginPath();
+                ctx.moveTo(-8, 35);
+                ctx.lineTo(0, 35 + flameHeight);
+                ctx.lineTo(8, 35);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.6 * intensity})`;
+                ctx.beginPath();
+                ctx.moveTo(-5, 35);
+                ctx.lineTo(0, 35 + flameHeight * 0.6);
+                ctx.lineTo(5, 35);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            const bodyGradient = ctx.createLinearGradient(-20, -50, 20, 35);
+            bodyGradient.addColorStop(0, '#e74c3c');
+            bodyGradient.addColorStop(1, '#c0392b');
+            ctx.fillStyle = bodyGradient;
+            ctx.beginPath();
+            ctx.moveTo(0, -50);
+            ctx.lineTo(20, 0);
+            ctx.lineTo(20, 35);
+            ctx.lineTo(-20, 35);
+            ctx.lineTo(-20, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#c0392b';
+            ctx.beginPath();
+            ctx.moveTo(0, -50);
+            ctx.lineTo(-20, 0);
+            ctx.lineTo(20, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath();
+            ctx.moveTo(0, -50);
+            ctx.lineTo(-10, -15);
+            ctx.lineTo(0, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#3498db';
+            ctx.beginPath();
+            ctx.arc(0, -15, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.beginPath();
+            ctx.arc(-4, -18, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#f5f5f5';
+            ctx.beginPath();
+            ctx.arc(0, -15, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#64b5f6';
+            ctx.beginPath();
+            ctx.arc(0, -17, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(-20, 5, 40, 3);
+
+            ctx.fillStyle = '#95a5a6';
+            ctx.beginPath();
+            ctx.moveTo(-20, 20);
+            ctx.lineTo(-38, 35);
+            ctx.lineTo(-20, 35);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(20, 20);
+            ctx.lineTo(38, 35);
+            ctx.lineTo(20, 35);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath();
+            ctx.moveTo(-20, 22);
+            ctx.lineTo(-32, 35);
+            ctx.lineTo(-20, 35);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawPlanet(x, y, planetData, scale = 1) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+
+            const size = planetData.size;
+
+            const outerGlow = ctx.createRadialGradient(0, 0, size * 0.9, 0, 0, size * 2);
+            outerGlow.addColorStop(0, planetData.atmosphere + '30');
+            outerGlow.addColorStop(0.5, planetData.atmosphere + '15');
+            outerGlow.addColorStop(1, planetData.atmosphere + '00');
+            ctx.fillStyle = outerGlow;
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            const atmGradient = ctx.createRadialGradient(0, 0, size * 0.8, 0, 0, size * 1.2);
+            atmGradient.addColorStop(0, planetData.atmosphere + '00');
+            atmGradient.addColorStop(0.7, planetData.atmosphere + '40');
+            atmGradient.addColorStop(1, planetData.atmosphere + '00');
+            ctx.fillStyle = atmGradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 1.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            const planetGradient = ctx.createRadialGradient(-size * 0.3, -size * 0.3, 0, 0, 0, size);
+            planetGradient.addColorStop(0, planetData.color);
+            planetGradient.addColorStop(1, shadeColor(planetData.color, -40));
+            ctx.fillStyle = planetGradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, size, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2 + Date.now() / 10000;
+                const distance = size * (0.3 + Math.random() * 0.4);
+                const detailX = Math.cos(angle) * distance;
+                const detailY = Math.sin(angle) * distance;
+                const detailSize = size * (0.1 + Math.random() * 0.15);
+                ctx.beginPath();
+                ctx.arc(detailX, detailY, detailSize, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            const highlight = ctx.createRadialGradient(-size * 0.4, -size * 0.4, 0, -size * 0.4, -size * 0.4, size * 0.5);
+            highlight.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+            highlight.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = highlight;
+            ctx.beginPath();
+            ctx.arc(-size * 0.3, -size * 0.3, size * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (planetData.rings) {
+                ctx.strokeStyle = 'rgba(200, 200, 200, 0.3)';
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size * 1.6, size * 0.4, -0.3, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(180, 180, 180, 0.5)';
+                ctx.lineWidth = 12;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size * 1.8, size * 0.5, -0.3, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function shadeColor(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255))
+                .toString(16).slice(1);
+        }
+
+        function createParticles(x, y, count, color = 'rgba(100, 181, 246, 1)') {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 2;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1,
+                    size: Math.random() * 4 + 2,
+                    color: color
+                });
+            }
+        }
+
+        function createSpeedLines() {
+            speedLines = [];
+            for (let i = 0; i < 100; i++) {
+                speedLines.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    length: Math.random() * 100 + 50,
+                    speed: Math.random() * 20 + 10,
+                    opacity: Math.random() * 0.5 + 0.3
+                });
+            }
+        }
+
+        function updateParticles() {
+            particles = particles.filter(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= 0.98;
+                p.vy *= 0.98;
+                p.life -= 0.02;
+                return p.life > 0;
+            });
+        }
+
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.fillStyle = p.color.replace('1)', `${p.life})`);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function updateSpeedLines() {
+            if (!isTransitioning) return;
+
+            speedLines.forEach(line => {
+                line.x -= line.speed;
+                if (line.x < -line.length) {
+                    line.x = width + line.length;
+                    line.y = Math.random() * height;
+                }
+            });
+        }
+
+        function drawSpeedLines() {
+            if (!isTransitioning) return;
+
+            speedCtx.clearRect(0, 0, width, height);
+            speedLines.forEach(line => {
+                speedCtx.strokeStyle = `rgba(100, 181, 246, ${line.opacity * transitionProgress})`;
+                speedCtx.lineWidth = 2;
+                speedCtx.beginPath();
+                speedCtx.moveTo(line.x, line.y);
+                speedCtx.lineTo(line.x + line.length, line.y);
+                speedCtx.stroke();
+            });
+        }
+
+        function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(10, 10, 15, 0.2)';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.save();
+            const shakeX = (Math.random() - 0.5) * camera.shake;
+            const shakeY = (Math.random() - 0.5) * camera.shake;
+            ctx.translate(width / 2 + shakeX, height / 2 + shakeY);
+            ctx.scale(camera.zoom, camera.zoom);
+            ctx.translate(-width / 2, -height / 2);
+
+            const planetX = width * 0.75;
+            const planetY = height * 0.4;
+            
+            const planetScale = isTransitioning ? 
+                (1 + (1 - transitionProgress) * 0.5) : 1;
+            drawPlanet(planetX, planetY, planet, planetScale);
+
+            if (isTransitioning) {
+                const startX = width * 0.25;
+                const startY = height * 0.5;
+                const endX = width * 0.75;
+                const endY = height * 0.4;
+                
+                const easeProgress = easeInOutCubic(transitionProgress);
+                rocket.x = startX + (endX - startX) * easeProgress;
+                
+                const arcHeight = 200;
+                const arcCurve = Math.sin(easeProgress * Math.PI);
+                rocket.y = startY + (endY - startY) * easeProgress - arcCurve * arcHeight;
+                
+                const dx = (endX - startX) * (1 - Math.cos(easeProgress * Math.PI)) * 0.5;
+                const dy = (endY - startY) * easeProgress - arcCurve * arcHeight;
+                const targetRotation = Math.atan2(dy, dx) + Math.PI / 2;
+                rocket.rotation = targetRotation;
+                
+                if (transitionProgress < 0.4) {
+                    rocket.scale = 1.2 + easeInOutCubic(transitionProgress / 0.4) * 0.4;
+                } else if (transitionProgress > 0.6) {
+                    const scaleProgress = (transitionProgress - 0.6) / 0.4;
+                    rocket.scale = 1.6 - easeInOutCubic(scaleProgress) * 0.4;
+                } else {
+                    rocket.scale = 1.6;
+                }
+                
+                drawRocket(rocket.x, rocket.y, rocket.rotation, rocket.scale);
+                
+                if (rocket.thrustIntensity > 0.3) {
+                    const exhaustAngle = rocket.rotation + Math.PI;
+                    const exhaustDistance = 50 * rocket.scale;
+                    
+                    if (Math.random() < 0.6) {
+                        const spreadAngle = exhaustAngle + (Math.random() - 0.5) * 0.4;
+                        const spreadDist = exhaustDistance + Math.random() * 20;
+                        createParticles(
+                            rocket.x + Math.cos(spreadAngle) * spreadDist,
+                            rocket.y + Math.sin(spreadAngle) * spreadDist,
+                            1,
+                            Math.random() < 0.5 ? 
+                                'rgba(243, 156, 18, 1)' : 
+                                'rgba(231, 76, 60, 1)'
+                        );
+                    }
+                }
+            }
+
+            ctx.restore();
+
+            updateParticles();
+            drawParticles();
+            
+            updateSpeedLines();
+            drawSpeedLines();
+
+            if (isTransitioning && transitionProgress < 1) {
+                transitionProgress += 0.008;
+                
+                if (transitionProgress < 0.25) {
+                    rocket.thrustIntensity = easeInOutCubic(transitionProgress / 0.25);
+                    camera.shake = rocket.thrustIntensity * 4;
+                    speedCanvas.classList.add('active');
+                }
+                else if (transitionProgress < 0.75) {
+                    rocket.thrustIntensity = 1;
+                    camera.shake = 2.5;
+                    const zoomProgress = (transitionProgress - 0.25) / 0.5;
+                    camera.zoom = 1 - easeInOutCubic(zoomProgress) * 0.4;
+                }
+                else {
+                    const decelerateProgress = (transitionProgress - 0.75) / 0.25;
+                    rocket.thrustIntensity = 1 - easeInOutCubic(decelerateProgress);
+                    camera.shake = rocket.thrustIntensity * 2.5;
+                    camera.zoom = 0.6 + easeInOutCubic(decelerateProgress) * 0.4;
+                }
+            } else if (isTransitioning && transitionProgress >= 1) {
+                isTransitioning = false;
+                rocket.thrustIntensity = 0;
+                camera.shake = 0;
+                camera.zoom = 1;
+                speedCanvas.classList.remove('active');
+                
+                try {
+                    window.parent.postMessage({ type: 'exoTransitionDone', planet: planetName }, '*');
+                } catch(e) {
+                    console.error('Failed to send completion message', e);
+                }
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        createStars();
+        createSpeedLines();
+        animate();
+    </script>
+</body>
+</html>
+    <style>
+      :root{color-scheme: dark}
+      html,body{height:100%;margin:0;background:#000;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial}
+      .wrap{height:100%;display:flex;align-items:center;justify-content:center}
+      .card{width:min(980px,96%);height:min(540px,86%);position:relative;background:linear-gradient(180deg,#04060a,#071018);border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#e6f7ff}
+      #canvas{width:100%;height:100%;display:block}
+      .overlay{position:absolute;inset:18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;pointer-events:none}
+      .title{pointer-events:auto;margin-bottom:22px;font-size:20px;font-weight:700;text-shadow:0 6px 18px rgba(0,0,0,0.6)}
+      .controls{position:absolute;top:16px;right:16px;pointer-events:auto}
+      .skip{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
+      .progressWrap{width:64%;max-width:520px;pointer-events:auto;margin-bottom:24px}
+      .sr{position:absolute;left:-9999px}
+      .progress{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden}
+      .bar{height:100%;width:0%;background:linear-gradient(90deg,#6fe,#3af);transition:width 200ms linear}
+      /* reduced motion */
+      @media (prefers-reduced-motion: reduce){
+        .bar{transition:none}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+  <div class="card" role="dialog" aria-label="Transition to 3D view" aria-describedby="transDesc">
+
+  <canvas id="canvas" aria-hidden="true"></canvas>
+
+  <div class="overlay">
+          <div id="transDesc" class="sr" aria-live="polite">Preparing transition</div>
+          <div class="title" id="title">Preparing transition…</div>
+          <div class="progressWrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress"><div class="bar" id="bar"></div></div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="skipBtn" class="skip" aria-label="Skip transition">Skip</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function(){
+        const params = new URLSearchParams(location.search);
+        const planet = params.get('planet') || '';
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const bar = document.getElementById('bar');
+        const title = document.getElementById('title');
+        const skipBtn = document.getElementById('skipBtn');
+        const transDesc = document.getElementById('transDesc');
+
+        title.textContent = planet ? `Exploring ${planet}` : 'Preparing transition...';
+        transDesc.textContent = title.textContent;
+
+        // Accessibility: focus skip button for keyboard users
+        skipBtn.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); skipBtn.click(); } });
+        skipBtn.focus();
+
+        // sizing helper
+        function resize(){
+          const dpr = Math.max(1, window.devicePixelRatio || 1);
+          const r = canvas.getBoundingClientRect();
+          canvas.width = Math.max(300, Math.floor(r.width * dpr));
+          canvas.height = Math.max(200, Math.floor(r.height * dpr));
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+  // Compute image path early so fallback can use it
+  const imgPath = params.get('image') || (planet ? `/images/${planet.toLowerCase().replace(/[^a-z0-9\-]/g,'').replace(/\s+/g,'-')}.jpg` : null);
+  // Three.js based scene for richer 3D transition
+  let screenshotDataUrl = null;
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // dynamic import of Three.js as module from unpkg to avoid bundler issues
+        (async function runThree(){
+          try{
+            const THREE = await import('https://unpkg.com/three@0.164.0/build/three.module.js');
+            const { OrbitControls } = await import('https://unpkg.com/three@0.164.0/examples/jsm/controls/OrbitControls.js');
+
+            // renderer
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setPixelRatio(Math.max(1, window.devicePixelRatio || 1));
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+            // scene & camera
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 3.5);
+
+            // lights - stronger, layered lighting for visible speculars
+            const dir = new THREE.DirectionalLight(0xffffff, 1.0);
+            dir.position.set(5,5,5); scene.add(dir);
+            const amb = new THREE.AmbientLight(0xffffff, 0.8); scene.add(amb);
+            const hemi = new THREE.HemisphereLight(0xaaaaff, 0x220022, 0.5); scene.add(hemi);
+            const pLight = new THREE.PointLight(0xffffff, 0.7, 0); pLight.position.set(2,2,2); scene.add(pLight);
+
+            // geometry
+            const geom = new THREE.SphereGeometry(1, 64, 64);
+            const mat = new THREE.MeshStandardMaterial({ color: 0x4466ff, metalness: 0.15, roughness: 0.45, emissive: 0x002233 });
+            const mesh = new THREE.Mesh(geom, mat); scene.add(mesh);
+
+            // subtle environment (large sphere) for nicer reflections
+            const envGeo = new THREE.SphereGeometry(40, 32, 32);
+            const envMat = new THREE.MeshBasicMaterial({ color: 0x000814, side: THREE.BackSide });
+            const env = new THREE.Mesh(envGeo, envMat); scene.add(env);
+
+            // controls only to allow a tiny interactive feel; disabled if reduced-motion
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enablePan = false; controls.enableZoom = false;
+            controls.enableDamping = true; controls.dampingFactor = 0.08;
+            if (reduceMotion) { controls.enableRotate = false; }
+
+            // responsive
+            function onResize(){
+              const w = canvas.clientWidth, h = canvas.clientHeight;
+              camera.aspect = Math.max(1, w / h);
+              camera.updateProjectionMatrix();
+              renderer.setSize(w, h, false);
+            }
+            window.addEventListener('resize', onResize);
+
+            // ensure renderer encoding set for correct colors when available
+            try { renderer.outputEncoding = (THREE.sRGBEncoding || THREE.LinearEncoding); } catch(e) {}
+
+            // run resize once to ensure proper buffer sizing before first render
+            onResize();
+
+            // try load texture from image param or derived path (imgPath computed above)
+            if (imgPath) {
+              try{
+                const texLoader = new THREE.TextureLoader();
+                texLoader.setCrossOrigin('anonymous');
+                const tex = await texLoader.loadAsync(imgPath);
+                tex.encoding = (THREE.sRGBEncoding || THREE.LinearEncoding);
+                mat.map = tex; mat.needsUpdate = true;
+                // capture a small screenshot (low quality)
+                renderer.render(scene, camera);
+                try { screenshotDataUrl = renderer.domElement.toDataURL('image/jpeg', 0.75); } catch(e) { screenshotDataUrl = null }
+              } catch(e) {
+                // ignore and keep color fallback
+                console.warn('Transition texture load failed', e);
+              }
+            }
+
+            // animate
+            let stopped = false;
+            function animate(){
+                if (!stopped){
+                if (!reduceMotion) mesh.rotation.y += 0.01;
+                controls.update();
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+              }
+            }
+            animate();
+
+            // progress simulation
+            let pct = 0;
+            const progInterval = setInterval(()=>{
+              pct = Math.min(100, pct + (Math.random()*8 + 6));
+              bar.style.width = pct + '%';
+              try{ document.querySelector('[role=progressbar]').setAttribute('aria-valuenow', String(Math.floor(pct))); } catch(e){}
+              if (pct >= 100){
+                clearInterval(progInterval);
+                stopped = true;
+                // final render then send screenshot
+                renderer.render(scene, camera);
+                try{ const thumb = screenshotDataUrl || renderer.domElement.toDataURL('image/jpeg', 0.8); window.parent.postMessage({ type: 'exoTransitionDone', planet, screenshot: thumb }, '*'); }
+                catch(e){ window.parent.postMessage({ type: 'exoTransitionDone', planet }, '*'); }
+              }
+            }, reduceMotion ? 20 : 220);
+
+            // skip action
+            skipBtn.addEventListener('click', ()=>{
+              clearInterval(progInterval);
+              stopped = true;
+              try{ const thumb = screenshotDataUrl || renderer.domElement.toDataURL('image/jpeg', 0.7); window.parent.postMessage({ type: 'exoTransitionDone', planet, screenshot: thumb }, '*'); }
+              catch(e){ window.parent.postMessage({ type: 'exoTransitionDone', planet }, '*'); }
+            });
+
+            // expose hook
+            window.__exoCompleteTransition = function(){ skipBtn.click(); }
+
+          }catch(e){
+            console.error('Three.js transition failed, falling back to image or simple finish', e);
+            // If we have a planet image, draw it to canvas as a circular thumbnail and animate briefly
+            if (imgPath && canvas && ctx) {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                try{
+                  // clear and draw centered circular crop
+                  const w = canvas.width, h = canvas.height;
+                  ctx.clearRect(0,0,w,h);
+                  // draw background
+                  ctx.fillStyle = '#071018'; ctx.fillRect(0,0,w,h);
+                  // compute diameter and center
+                  const d = Math.min(w,h) * 0.78;
+                  const cx = w/2, cy = h/2 - 20;
+                  // create circular clipping
+                  ctx.save();
+                  ctx.beginPath();
+                  ctx.arc(cx, cy, d/2, 0, Math.PI*2);
+                  ctx.closePath();
+                  ctx.clip();
+                  // draw image scaled to cover
+                  const ar = img.width / img.height;
+                  let dw = d, dh = d;
+                  if (ar > 1) { dh = d; dw = d * ar; }
+                  else { dw = d; dh = d / ar; }
+                  ctx.drawImage(img, cx - dw/2, cy - dh/2, dw, dh);
+                  ctx.restore();
+                  // small fade-in of progress bar
+                  bar.style.width = '100%';
+                }catch(err){ console.warn('Canvas fallback draw failed', err); }
+                // allow 500ms to show fallback then notify parent
+                setTimeout(()=>{ try{ window.parent.postMessage({ type: 'exoTransitionDone', planet }, '*'); } catch(e){} }, 500);
+              };
+              img.onerror = () => {
+                title.textContent = 'Finishing transition...';
+                transDesc.textContent = 'Completing transition.';
+                try{ bar.style.width = '100%'; } catch(e){}
+                setTimeout(()=>{ try{ window.parent.postMessage({ type: 'exoTransitionDone', planet }, '*'); } catch(e){} }, 600);
+              };
+              img.src = imgPath;
+            } else {
+              try{ title.textContent = 'Finishing transition...'; } catch(e){}
+              try{ transDesc.textContent = 'Completing transition.'; } catch(e){}
+              try{ bar.style.width = '100%'; } catch(e){}
+              setTimeout(()=>{ try{ window.parent.postMessage({ type: 'exoTransitionDone', planet }, '*'); } catch(e){} }, 600);
+            }
+          }
+        })();
+        })();
+    </script>
+  </body>
+</html>

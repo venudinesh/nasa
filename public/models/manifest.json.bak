@@ -1,0 +1,6 @@
+{
+    "models":  {
+                   "k2-18b":  "/models/Avocado.glb",
+                   "kepler-186f":  "/models/DamagedHelmet.glb"
+               }
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test All Planet Animations</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            color: #e6f7ff;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #64b5f6;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .planet-card {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #2a2a3e;
+            transition: all 0.3s;
+        }
+        .planet-card:hover {
+            border-color: #64b5f6;
+            box-shadow: 0 0 20px rgba(100, 181, 246, 0.3);
+        }
+        .planet-name {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #64b5f6;
+        }
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .info {
+            font-size: 0.85em;
+            color: #a0a0b0;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Test Journey Animation for All Planets</h1>
+        <div class="grid" id="planetGrid"></div>
+    </div>
+
+    <script>
+        const planets = [
+            { name: 'Kepler-186f', type: 'Earth-like' },
+            { name: 'Proxima Centauri b', type: 'Nearest exoplanet' },
+            { name: 'TRAPPIST-1e', type: 'Potentially habitable' },
+            { name: 'TOI-715 b', type: 'Super-Earth' },
+            { name: 'HD 40307g', type: 'Super-Earth' },
+            { name: '55 Cancri e', type: 'Diamond planet' },
+            { name: 'WASP-12b', type: 'Hot Jupiter' },
+            { name: 'Gliese 667Cc', type: 'Super-Earth' },
+            { name: 'K2-18b', type: 'Mini-Neptune' },
+            { name: 'GJ 1002b', type: 'Super-Earth' },
+            { name: 'KELT-9 b', type: 'Ultra-hot Jupiter' },
+            { name: 'PSR B1620-26 b', type: 'Ancient world' }
+        ];
+
+        const grid = document.getElementById('planetGrid');
+
+        planets.forEach(planet => {
+            const card = document.createElement('div');
+            card.className = 'planet-card';
+            card.innerHTML = `
+                <div class="planet-name">${planet.name}</div>
+                <button class="test-btn" onclick="testPlanet('${planet.name}')">
+                    Launch Animation
+                </button>
+                <div class="info">${planet.type}</div>
+            `;
+            grid.appendChild(card);
+        });
+
+        function testPlanet(planetName) {
+            const url = `/transition.html?planet=${encodeURIComponent(planetName)}`;
+            window.open(url, '_blank', 'width=1200,height=700');
+        }
+    </script>
+</body>
+</html>
